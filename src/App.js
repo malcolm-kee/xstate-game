@@ -1,24 +1,28 @@
+import { useMachine } from '@xstate/react';
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import { gameMachine } from './machine';
 
 function App() {
+  const [current, send] = useMachine(gameMachine);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <header>{current.value}</header>
+      <pre>{JSON.stringify(current.context, null, 2)}</pre>
+      <div>
+        {current.value === 'landing' && (
+          <button onClick={() => send('START')}>Start</button>
+        )}
+        {current.value === 'playing' && (
+          <button onClick={() => send('COMPLETE_ORDER')}>
+            Complete Order!
+          </button>
+        )}
+        {(current.value === 'win' || current.value === 'lose') && (
+          <button onClick={() => send('REPLAY')}>Replay</button>
+        )}
+      </div>
     </div>
   );
 }
