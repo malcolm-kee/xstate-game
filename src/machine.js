@@ -5,8 +5,6 @@ export const gameMachine = Machine(
     id: 'game',
     initial: 'landing',
     context: {
-      gameDuration: 20000,
-      requiredOrders: 2,
       remainingTime: 20000,
       remainingOrders: 2,
     },
@@ -56,8 +54,8 @@ export const gameMachine = Machine(
   {
     actions: {
       resetGame: assign({
-        remainingTime: context => context.gameDuration,
-        remainingOrders: context => context.requiredOrders,
+        remainingTime: 20000,
+        remainingOrders: () => (Math.random() > 0.5 ? 3 : 2),
       }),
       deductRemainingOrders: assign({
         remainingOrders: context => context.remainingOrders - 1,
