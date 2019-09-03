@@ -1,6 +1,6 @@
 import { assign, Machine } from 'xstate';
-import { createEmptyArray, flatten } from './array';
-import { randomInt, randomItems, insertRandom } from './random';
+import { createEmptyArray, flatten } from './lib/array';
+import { insertRandom, randomInt, randomItems } from './lib/random';
 import { Food } from './type';
 
 const FOOD_OPTIONS: Readonly<Food[]> = ['nasi-lemak', 'satay', 'teh-tarik'];
