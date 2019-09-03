@@ -1,15 +1,48 @@
 import { useMachine } from '@xstate/react';
 import * as React from 'react';
 import './App.css';
+import { Food } from './type';
 import { gameMachine } from './machine';
 
 function App() {
-  const [current, send] = useMachine(gameMachine);
+  const [items, setItems] = React.useState<Food[]>([]);
+  const machine = React.useMemo(
+    () =>
+      gameMachine.withConfig({
+        activities: {
+          spawnItem: context => {
+            let index = 0;
+            let timeoutId: number;
+
+            function spawn() {
+              setItems(currentItems =>
+                currentItems.concat(context.data.items[index])
+              );
+              index++;
+              if (context.data.items.length > index) {
+                timeoutId = setTimeout(spawn, 1000);
+              }
+            }
+
+            timeoutId = setTimeout(spawn, 1000);
+
+            return () => clearTimeout(timeoutId);
+          },
+        },
+      }),
+    []
+  );
+  const [current, send] = useMachine(machine);
 
   return (
     <div className="App">
       <header>{current.value}</header>
-      <pre>{JSON.stringify(current.context, null, 2)}</pre>
+      <div>
+        Coming Items:
+        <pre>{JSON.stringify(current.context.data.orders, null, 2)}</pre>
+      </div>
+      <div>{current.context.remainingTime / 1000} s</div>
+      <div>{current.context.result.currentOrder}</div>
       <div>
         {current.value === 'landing' && (
           <button onClick={() => send('START')}>Start</button>
@@ -34,6 +67,11 @@ function App() {
             <button onClick={() => send('COMPLETE_ORDER')}>
               Complete Order!
             </button>
+            <div>
+              {items.map((item, i) => (
+                <span key={i}>{item}</span>
+              ))}
+            </div>
           </div>
         )}
         {(current.value === 'win' || current.value === 'lose') && (

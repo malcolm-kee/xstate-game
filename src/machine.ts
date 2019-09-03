@@ -1,8 +1,7 @@
 import { assign, Machine } from 'xstate';
 import { createEmptyArray, flatten } from './array';
 import { randomInt, randomItems, insertRandom } from './random';
-
-type Food = 'nasi-lemak' | 'satay' | 'teh-tarik';
+import { Food } from './type';
 
 const FOOD_OPTIONS: Readonly<Food[]> = ['nasi-lemak', 'satay', 'teh-tarik'];
 
@@ -57,7 +56,7 @@ export const gameMachine = Machine<GameContext, GameStateSchema, GameEvent>(
       },
       playing: {
         entry: 'resetGame',
-        // invoke spawn item activities
+        activities: 'spawnItem',
         invoke: {
           id: 'countdown',
           src: 'countdown',
@@ -147,6 +146,24 @@ export const gameMachine = Machine<GameContext, GameStateSchema, GameEvent>(
         const interval = setInterval(() => callback('TICK'), 1000);
 
         return () => clearInterval(interval);
+      },
+    },
+    activities: {
+      spawnItem: context => {
+        let index = 0;
+        let timeoutId: number;
+
+        function spawn() {
+          console.log(`Spawning ${context.data.items[index]}`);
+          index++;
+          if (context.data.items.length > index) {
+            timeoutId = setTimeout(spawn, 1000);
+          }
+        }
+
+        timeoutId = setTimeout(spawn, 1000);
+
+        return () => clearTimeout(timeoutId);
       },
     },
   }
