@@ -15,9 +15,26 @@ function App() {
           <button onClick={() => send('START')}>Start</button>
         )}
         {current.value === 'playing' && (
-          <button onClick={() => send('COMPLETE_ORDER')}>
-            Complete Order!
-          </button>
+          <div>
+            <button
+              onClick={() => send({ type: 'SELECT_FOOD', food: 'nasi-lemak' })}
+            >
+              Nasi Lemak
+            </button>
+            <button
+              onClick={() => send({ type: 'SELECT_FOOD', food: 'satay' })}
+            >
+              Satay
+            </button>
+            <button
+              onClick={() => send({ type: 'SELECT_FOOD', food: 'teh-tarik' })}
+            >
+              Teh Tarik
+            </button>
+            <button onClick={() => send('COMPLETE_ORDER')}>
+              Complete Order!
+            </button>
+          </div>
         )}
         {(current.value === 'win' || current.value === 'lose') && (
           <button onClick={() => send('REPLAY')}>Replay</button>

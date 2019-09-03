@@ -8,10 +8,13 @@ const FOOD_OPTIONS: Readonly<Food[]> = ['nasi-lemak', 'satay', 'teh-tarik'];
 
 interface GameContext {
   remainingTime: number;
-  remainingOrders: number;
   data: {
     orders: Food[][];
     items: Food[];
+  };
+  result: {
+    currentOrder: number;
+    selectedItem: Food[];
   };
 }
 
@@ -28,7 +31,8 @@ type GameEvent =
   | { type: 'START' }
   | { type: 'COMPLETE_ORDER' }
   | { type: 'TICK' }
-  | { type: 'REPLAY' };
+  | { type: 'REPLAY' }
+  | { type: 'SELECT_FOOD'; food: Food };
 
 export const gameMachine = Machine<GameContext, GameStateSchema, GameEvent>(
   {
@@ -36,10 +40,13 @@ export const gameMachine = Machine<GameContext, GameStateSchema, GameEvent>(
     initial: 'landing',
     context: {
       remainingTime: 20000,
-      remainingOrders: 2,
       data: {
         orders: [],
         items: [],
+      },
+      result: {
+        currentOrder: 0,
+        selectedItem: [],
       },
     },
     states: {
@@ -66,11 +73,11 @@ export const gameMachine = Machine<GameContext, GameStateSchema, GameEvent>(
               cond: 'isTimeout',
             },
           ],
-          COMPLETE_ORDER: {
-            actions: 'deductRemainingOrders',
-          },
           TICK: {
             actions: 'oneSecondPass',
+          },
+          SELECT_FOOD: {
+            actions: 'selectItem',
           },
         },
       },
@@ -90,7 +97,6 @@ export const gameMachine = Machine<GameContext, GameStateSchema, GameEvent>(
     actions: {
       resetGame: assign<GameContext>({
         remainingTime: 20000,
-        remainingOrders: (): number => (Math.random() > 0.5 ? 3 : 2),
         data: () => {
           const orderCount = randomInt(3, 2);
 
@@ -104,15 +110,36 @@ export const gameMachine = Machine<GameContext, GameStateSchema, GameEvent>(
           };
         },
       }),
-      deductRemainingOrders: assign<GameContext>({
-        remainingOrders: context => context.remainingOrders - 1,
-      }),
       oneSecondPass: assign<GameContext>({
         remainingTime: context => context.remainingTime - 1000,
       }),
+      selectItem: assign<GameContext>({
+        result: ({ data, result }, event) => {
+          const food: Food = event.food;
+
+          const orderItems = data.orders[result.currentOrder].slice();
+          result.selectedItem.forEach(item => {
+            orderItems.splice(orderItems.indexOf(item), 1);
+          });
+
+          if (orderItems.indexOf(food) !== -1) {
+            return {
+              currentOrder:
+                orderItems.length === 1
+                  ? result.currentOrder + 1
+                  : result.currentOrder,
+              selectedItem:
+                orderItems.length === 1 ? [] : result.selectedItem.concat(food),
+            };
+          }
+
+          return result;
+        },
+      }),
     },
     guards: {
-      isAllOrdersCompleted: context => context.remainingOrders === 0,
+      isAllOrdersCompleted: ({ data, result }) =>
+        data.orders.length === result.currentOrder,
       isTimeout: context => context.remainingTime <= 0,
     },
     services: {
