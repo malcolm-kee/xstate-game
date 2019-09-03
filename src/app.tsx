@@ -1,10 +1,11 @@
 import { useMachine } from '@xstate/react';
 import * as React from 'react';
 import './App.css';
-import { Food } from './type';
+import { Item } from './components/item';
 import { gameMachine } from './machine';
+import { Food } from './type';
 
-function App() {
+export const App = () => {
   const [items, setItems] = React.useState<Food[]>([]);
   const machine = React.useMemo(
     () =>
@@ -32,54 +33,90 @@ function App() {
       }),
     []
   );
-  const [current, send] = useMachine(machine);
+  const [{ context, value: gameState }, send] = useMachine(machine);
+
+  const orderItems = React.useMemo(() => {
+    const allOrderItems = (
+      context.data.orders[context.result.currentOrder] || []
+    ).slice();
+    const selectedItems: Food[] = [];
+
+    context.result.selectedItem.forEach(selected => {
+      const [selectedItem] = allOrderItems.splice(
+        allOrderItems.indexOf(selected),
+        1
+      );
+      selectedItems.push(selectedItem);
+    });
+
+    return selectedItems
+      .map(food => ({ food, selected: true }))
+      .concat(allOrderItems.map(food => ({ food, selected: false })));
+  }, [
+    context.data.orders,
+    context.result.currentOrder,
+    context.result.selectedItem,
+  ]);
 
   return (
     <div className="App">
-      <header>{current.value}</header>
       <div>
-        Coming Items:
-        <pre>{JSON.stringify(current.context.data.orders, null, 2)}</pre>
-      </div>
-      <div>{current.context.remainingTime / 1000} s</div>
-      <div>{current.context.result.currentOrder}</div>
-      <div>
-        {current.value === 'landing' && (
+        {gameState === 'landing' && (
           <button onClick={() => send('START')}>Start</button>
         )}
-        {current.value === 'playing' && (
-          <div>
-            <button
-              onClick={() => send({ type: 'SELECT_FOOD', food: 'nasi-lemak' })}
-            >
-              Nasi Lemak
-            </button>
-            <button
-              onClick={() => send({ type: 'SELECT_FOOD', food: 'satay' })}
-            >
-              Satay
-            </button>
-            <button
-              onClick={() => send({ type: 'SELECT_FOOD', food: 'teh-tarik' })}
-            >
-              Teh Tarik
-            </button>
-            <button onClick={() => send('COMPLETE_ORDER')}>
-              Complete Order!
-            </button>
-            <div>
+        {gameState === 'playing' && (
+          <div className="game-panel">
+            <div style={{ background: '#bbb', position: 'relative' }}>
               {items.map((item, i) => (
-                <span key={i}>{item}</span>
+                <Item
+                  onClick={() => send({ type: 'SELECT_FOOD', food: item })}
+                  type={item}
+                  key={i}
+                />
               ))}
+            </div>
+            <div>
+              <header>{gameState}</header>
+              <div>
+                <div>{context.remainingTime / 1000} s</div>
+                <div>
+                  {context.result.currentOrder} / {context.data.orders.length}
+                </div>
+                <p>Orders</p>
+                <ul>
+                  {orderItems.map((item, i) => (
+                    <li
+                      key={i}
+                      style={
+                        item.selected
+                          ? {
+                              textDecoration: 'line-through',
+                            }
+                          : undefined
+                      }
+                    >
+                      {item.food}
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
           </div>
         )}
-        {(current.value === 'win' || current.value === 'lose') && (
-          <button onClick={() => send('REPLAY')}>Replay</button>
+        {(gameState === 'win' || gameState === 'lose') && (
+          <div>
+            <p>{gameState}</p>
+            <button
+              onClick={() => {
+                send('REPLAY');
+                setItems([]);
+              }}
+            >
+              Replay
+            </button>
+          </div>
         )}
       </div>
     </div>
   );
-}
-
-export default App;
+};

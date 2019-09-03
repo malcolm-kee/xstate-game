@@ -28,7 +28,6 @@ interface GameStateSchema {
 
 type GameEvent =
   | { type: 'START' }
-  | { type: 'COMPLETE_ORDER' }
   | { type: 'TICK' }
   | { type: 'REPLAY' }
   | { type: 'SELECT_FOOD'; food: Food };
@@ -103,10 +102,19 @@ export const gameMachine = Machine<GameContext, GameStateSchema, GameEvent>(
             randomItems(FOOD_OPTIONS, randomInt(3, 2))
           );
 
+          const allOrderItems = flatten(orders);
+
           return {
             orders,
-            items: insertRandom(flatten(orders), randomItems(FOOD_OPTIONS, 20)),
+            items: insertRandom(
+              allOrderItems,
+              randomItems(FOOD_OPTIONS, 18 - allOrderItems.length)
+            ),
           };
+        },
+        result: {
+          currentOrder: 0,
+          selectedItem: [],
         },
       }),
       oneSecondPass: assign<GameContext>({
