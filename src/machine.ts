@@ -25,6 +25,7 @@ interface GameContext {
   result: {
     currentOrder: number;
     selectedItem: Food[];
+    score: number;
   };
 }
 
@@ -56,6 +57,7 @@ export const gameMachine = Machine<GameContext, GameStateSchema, GameEvent>(
       result: {
         currentOrder: 0,
         selectedItem: [],
+        score: 0,
       },
     },
     states: {
@@ -126,6 +128,7 @@ export const gameMachine = Machine<GameContext, GameStateSchema, GameEvent>(
         result: {
           currentOrder: 0,
           selectedItem: [],
+          score: 0,
         },
       }),
       oneSecondPass: assign<GameContext>({
@@ -141,17 +144,23 @@ export const gameMachine = Machine<GameContext, GameStateSchema, GameEvent>(
           });
 
           if (orderItems.indexOf(food) !== -1) {
+            const isOrderComplete = orderItems.length === 1;
             return {
-              currentOrder:
-                orderItems.length === 1
-                  ? result.currentOrder + 1
-                  : result.currentOrder,
-              selectedItem:
-                orderItems.length === 1 ? [] : result.selectedItem.concat(food),
+              currentOrder: isOrderComplete
+                ? result.currentOrder + 1
+                : result.currentOrder,
+              selectedItem: isOrderComplete
+                ? []
+                : result.selectedItem.concat(food),
+              score: isOrderComplete ? result.score + 3 : result.score + 1,
             };
           }
 
-          return result;
+          return {
+            currentOrder: result.currentOrder,
+            selectedItem: result.selectedItem,
+            score: result.score - 1,
+          };
         },
       }),
     },

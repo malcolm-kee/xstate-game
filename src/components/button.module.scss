@@ -1,0 +1,11 @@
+.btn {
+  cursor: pointer;
+  padding: 20px 30px;
+  border-radius: 100px;
+  font-size: larger;
+  transition: all 0.2s ease-in;
+  border: solid 1px blueviolet;
+  &:hover {
+    box-shadow: 5px 5px 0px blueviolet;
+  }
+}

@@ -1,0 +1,73 @@
+.item {
+  cursor: pointer;
+  position: absolute;
+  user-select: none;
+  animation: fall-down 5s ease-in forwards;
+  transition: all 0.1s linear;
+  transform: scale(1);
+  z-index: 1;
+
+  &:hover {
+    transform: scale(1.2);
+  }
+
+  img {
+    // improve game experience as image can be dragged
+    pointer-events: none;
+  }
+}
+
+@keyframes fall-down {
+  from {
+    top: 0;
+  }
+
+  to {
+    top: 100%;
+  }
+}
+
+@keyframes disappear {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    transform: scale(2);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.1) rotate(-480deg);
+  }
+}
+
+.clicked {
+  opacity: 0;
+  animation: disappear 0.5s linear;
+}
+
+@keyframes scoreDisappear {
+  0%,
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.marks {
+  position: relative;
+  opacity: 0;
+  font-size: xx-large;
+  text-shadow: 1px 1px black;
+  animation: scoreDisappear 1s linear;
+  top: -50px;
+}
+
+.red {
+  color: red;
+}
+
+.green {
+  color: lightgreen;
+}

@@ -1,10 +1,14 @@
 import { useMachine } from '@xstate/react';
 import * as React from 'react';
-import './App.css';
+import './app.scss';
+import { Button } from './components/button';
 import { Item } from './components/item';
+import { OrderItem } from './components/order-item';
+import { Paper } from './components/paper';
+import { Separator } from './components/separator';
+import { Timer } from './components/timer';
 import { gameMachine } from './machine';
 import { Food } from './type';
-import { OrderItem } from './components/order-item';
 
 export const App = () => {
   const [items, setItems] = React.useState<Food[]>([]);
@@ -36,23 +40,21 @@ export const App = () => {
   );
   const [{ context, value: gameState }, send] = useMachine(machine);
 
-  const orderItems = React.useMemo(() => {
+  const [matchedItems, remainingItems] = React.useMemo(() => {
     const allOrderItems = (
       context.data.orders[context.result.currentOrder] || []
     ).slice();
-    const selectedItems: Food[] = [];
+    const matchedItems: Food[] = [];
 
     context.result.selectedItem.forEach(selected => {
       const [selectedItem] = allOrderItems.splice(
         allOrderItems.indexOf(selected),
         1
       );
-      selectedItems.push(selectedItem);
+      matchedItems.push(selectedItem);
     });
 
-    return selectedItems
-      .map(food => ({ food, selected: true }))
-      .concat(allOrderItems.map(food => ({ food, selected: false })));
+    return [matchedItems, allOrderItems];
   }, [
     context.data.orders,
     context.result.currentOrder,
@@ -61,53 +63,67 @@ export const App = () => {
 
   return (
     <div className="App">
-      <div>
-        {gameState === 'landing' && (
-          <button onClick={() => send('START')}>Start</button>
-        )}
-        {gameState === 'playing' && (
-          <div className="game-panel">
-            <div style={{ background: '#bbb', position: 'relative' }}>
-              {items.map((item, i) => (
-                <Item
-                  onClick={() => send({ type: 'SELECT_FOOD', food: item })}
-                  type={item}
-                  key={i}
-                />
-              ))}
-            </div>
+      <div className="game-panel">
+        <div
+          style={{
+            background: '#fff',
+            position: 'relative',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          {gameState === 'landing' && (
+            <Button onClick={() => send('START')}>Start</Button>
+          )}
+          {gameState === 'playing' &&
+            items.map((item, i) => (
+              <Item
+                onClick={() => send({ type: 'SELECT_FOOD', food: item })}
+                matched={remainingItems.includes(item)}
+                type={item}
+                key={i}
+              />
+            ))}
+          {(gameState === 'win' || gameState === 'lose') && (
             <div>
-              <header>{gameState}</header>
-              <div>
-                <div>{context.remainingTime / 1000} s</div>
-                <div>
-                  {context.result.currentOrder} / {context.data.orders.length}
-                </div>
-                <p>Orders</p>
-                <ul>
-                  {orderItems.map((item, i) => (
-                    <li key={i}>
-                      <OrderItem type={item.food} isSelected={item.selected} />
-                    </li>
-                  ))}
-                </ul>
+              <div className="text-large">
+                <p>{gameState === 'win' ? 'You Win!' : 'Game Over!'}</p>
+                <p>Your score is {context.result.score}.</p>
               </div>
+              <Button
+                onClick={() => {
+                  send('REPLAY');
+                  setItems([]);
+                }}
+              >
+                Replay
+              </Button>
             </div>
-          </div>
-        )}
-        {(gameState === 'win' || gameState === 'lose') && (
+          )}
+        </div>
+        <Paper>
           <div>
-            <p>{gameState}</p>
-            <button
-              onClick={() => {
-                send('REPLAY');
-                setItems([]);
-              }}
-            >
-              Replay
-            </button>
+            <Timer remainingMs={context.remainingTime} />
+            <Separator />
+            <h2>Score: {context.result.score}</h2>
+            <Separator />
+            <h2>
+              Order completed: {context.result.currentOrder} /{' '}
+              {context.data.orders.length}
+            </h2>
+            {matchedItems.map((item, i) => (
+              <div key={i}>
+                <OrderItem type={item} isSelected={true} />
+              </div>
+            ))}
+            {remainingItems.map((item, i) => (
+              <div key={-i}>
+                <OrderItem type={item} isSelected={false} />
+              </div>
+            ))}
           </div>
-        )}
+        </Paper>
       </div>
     </div>
   );
