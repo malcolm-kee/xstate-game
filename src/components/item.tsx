@@ -1,5 +1,6 @@
 import cx from 'classnames';
 import * as React from 'react';
+import { foodImages } from '../images/food-images';
 import { randomInt } from '../lib/random';
 import { Food } from '../type';
 import classes from './item.module.scss';
@@ -28,7 +29,7 @@ export const Item: React.FC<ItemProps> = ({ type, onClick, matched }) => {
         left,
       }}
     >
-      <img alt={type} src={`/${type}.png`} className={classes.img} />
+      <img alt={type} src={foodImages[type]} className={classes.img} />
       {hit !== null && (
         <span
           className={`${classes.marks} ${hit ? classes.green : classes.red}`}
