@@ -1,11 +1,94 @@
+@import './constants';
+
 .text-large {
-  font-size: -webkit-xxx-large;
+  font-size: xx-large;
+
+  @media screen and (min-width: $medium-screen) {
+    font-size: -webkit-xxx-large;
+  }
 }
 
 .game-panel {
-  display: grid;
-  grid-template-columns: 1fr 300px;
   height: 100vh;
-  overflow: hidden;
+  display: flex;
+  flex-flow: column;
+
+  @media screen and (min-width: $medium-screen) {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    overflow: hidden;
+    text-align: center;
+  }
+}
+
+.game-dashboard {
+  font-size: 12px;
+  @media screen and (min-width: $small-screen) {
+    display: flex;
+    align-items: center;
+  }
+
+  @media screen and (min-width: $medium-screen) {
+    display: block;
+    font-size: 1rem;
+  }
+}
+
+.game-stats {
+  display: flex;
+  align-items: center;
+  padding: 0 $space;
+
+  @media screen and (max-width: $small-screen) {
+    font-size: 9px;
+    h1,
+    h2 {
+      margin: $space 0 0 0;
+    }
+  }
+
+  @media screen and (min-width: $medium-screen) {
+    display: block;
+  }
+}
+
+.playground {
+  background: #fff;
+  position: relative;
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+}
+
+.game-title {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  left: 0;
+  right: 0;
+  color: #777;
   text-align: center;
+}
+
+.order-items {
+  display: flex;
+  align-items: center;
+  min-height: 75px;
+
+  @media screen and (min-width: $medium-screen) {
+    display: block;
+  }
+}
+
+.small-only {
+  @media screen and (min-width: $small-screen) {
+    display: none;
+  }
+}
+
+.more-than-small {
+  @media screen and (max-width: $small-screen) {
+    display: none;
+  }
 }

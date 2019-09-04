@@ -1,0 +1,7 @@
+@import '../constants';
+
+.label {
+  @media screen and (max-width: $medium-screen) {
+    display: none;
+  }
+}

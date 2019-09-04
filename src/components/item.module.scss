@@ -1,3 +1,5 @@
+@import '../constants';
+
 .item {
   cursor: pointer;
   position: absolute;
@@ -70,4 +72,12 @@
 
 .green {
   color: lightgreen;
+}
+
+.img {
+  height: 60px;
+
+  @media screen and (min-width: $small-screen) {
+    height: 80px;
+  }
 }

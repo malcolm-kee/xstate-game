@@ -10,8 +10,10 @@ interface OrderItemProps {
 
 export const OrderItem: React.FC<OrderItemProps> = ({ type, isSelected }) => {
   return (
-    <div className={cx(classes.item, isSelected && classes.selected)}>
-      <img src={`/${type}.png`} alt={type} height={40} />
+    <div className={classes.item}>
+      <div className={cx(classes.inner, isSelected && classes.selected)}>
+        <img src={`/${type}.png`} alt={type} height={40} />
+      </div>
     </div>
   );
 };

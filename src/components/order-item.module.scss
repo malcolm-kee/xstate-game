@@ -9,6 +9,12 @@
   }
 }
 
+.inner {
+  display: inline-block;
+  position: relative;
+  min-width: 50px;
+}
+
 @mixin tick($rotation-angle) {
   content: '';
   width: 8px;
@@ -19,17 +25,17 @@
 }
 
 .selected {
-  &:after {
-    @include tick(45deg);
-    height: 35px;
-    left: 110px;
-  }
   &:before {
     @include tick(-45deg);
     height: 20px;
-    left: 93px;
     top: 10px;
+    left: -17px;
     z-index: 1;
+  }
+  &:after {
+    @include tick(45deg);
+    height: 35px;
+    left: 0px;
   }
   img {
     opacity: 0.5;

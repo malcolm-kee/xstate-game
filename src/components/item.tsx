@@ -28,7 +28,7 @@ export const Item: React.FC<ItemProps> = ({ type, onClick, matched }) => {
         left,
       }}
     >
-      <img alt={type} src={`/${type}.png`} height={80} />
+      <img alt={type} src={`/${type}.png`} className={classes.img} />
       {hit !== null && (
         <span
           className={`${classes.marks} ${hit ? classes.green : classes.red}`}

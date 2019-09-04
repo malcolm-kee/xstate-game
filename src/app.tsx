@@ -73,15 +73,8 @@ export const App = () => {
   return (
     <div className="App">
       <div className="game-panel">
-        <div
-          style={{
-            background: '#fff',
-            position: 'relative',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
+        <div className="playground">
+          <h1 className="game-title">Mamak Machine</h1>
           {gameState === 'landing' && (
             <Button onClick={() => send('START')}>Start</Button>
           )}
@@ -121,16 +114,18 @@ export const App = () => {
             </div>
           )}
         </div>
-        <Paper>
-          <div>
+        <Paper className="game-dashboard">
+          <div className="game-stats">
             <Timer remainingMs={context.remainingTime} />
             <Separator />
             <h2>Score: {context.result.score}</h2>
             <Separator />
             <h2>
-              Order completed: {context.result.currentOrder} /{' '}
-              {context.data.orders.length}
+              Order <span className="more-than-small">completed</span>:{' '}
+              {context.result.currentOrder} / {context.data.orders.length}
             </h2>
+          </div>
+          <div className="order-items">
             {selectedItems.map((item, i) => (
               <div key={i}>
                 <OrderItem type={item} isSelected={true} />
