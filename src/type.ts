@@ -1,1 +1,11 @@
-export type Food = 'nasi-lemak' | 'satay' | 'teh-tarik';
+export type Food =
+  | 'nasilemak'
+  | 'asamlaksa'
+  | 'bandung'
+  | 'kopi'
+  | 'limauais'
+  | 'ayamrendang'
+  | 'rotibakar'
+  | 'roticanai'
+  | 'soyacincau'
+  | 'tehtarik';

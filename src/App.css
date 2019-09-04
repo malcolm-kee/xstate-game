@@ -44,6 +44,14 @@
   animation: fall-down 5s ease-in forwards;
 }
 
+.order-item {
+  text-align: center;
+}
+
+.order-item--selected {
+  filter: grayscale(1);
+}
+
 @keyframes fall-down {
   from {
     top: 0;

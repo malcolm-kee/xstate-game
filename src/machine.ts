@@ -3,7 +3,18 @@ import { createEmptyArray, flatten } from './lib/array';
 import { insertRandom, randomInt, randomItems } from './lib/random';
 import { Food } from './type';
 
-const FOOD_OPTIONS: Readonly<Food[]> = ['nasi-lemak', 'satay', 'teh-tarik'];
+const FOOD_OPTIONS: Readonly<Food[]> = [
+  'nasilemak',
+  'asamlaksa',
+  'bandung',
+  'kopi',
+  'limauais',
+  'ayamrendang',
+  'rotibakar',
+  'roticanai',
+  'soyacincau',
+  'tehtarik',
+];
 
 interface GameContext {
   remainingTime: number;

@@ -4,6 +4,7 @@ import './App.css';
 import { Item } from './components/item';
 import { gameMachine } from './machine';
 import { Food } from './type';
+import { OrderItem } from './components/order-item';
 
 export const App = () => {
   const [items, setItems] = React.useState<Food[]>([]);
@@ -85,17 +86,8 @@ export const App = () => {
                 <p>Orders</p>
                 <ul>
                   {orderItems.map((item, i) => (
-                    <li
-                      key={i}
-                      style={
-                        item.selected
-                          ? {
-                              textDecoration: 'line-through',
-                            }
-                          : undefined
-                      }
-                    >
-                      {item.food}
+                    <li key={i}>
+                      <OrderItem type={item.food} isSelected={item.selected} />
                     </li>
                   ))}
                 </ul>

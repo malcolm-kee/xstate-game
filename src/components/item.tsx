@@ -24,7 +24,7 @@ export const Item: React.FC<ItemProps> = ({ type, onClick }) => {
         left,
       }}
     >
-      {type}
+      <img alt={type} src={`/${type}.png`} height={80} />
     </div>
   );
 };
