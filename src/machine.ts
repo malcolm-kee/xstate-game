@@ -32,6 +32,7 @@ interface GameContext {
 interface GameStateSchema {
   states: {
     landing: {};
+    starting: {};
     playing: {};
     win: {};
     lose: {};
@@ -63,7 +64,12 @@ export const gameMachine = Machine<GameContext, GameStateSchema, GameEvent>(
     states: {
       landing: {
         on: {
-          START: 'playing',
+          START: 'starting',
+        },
+      },
+      starting: {
+        after: {
+          START_DELAY: 'playing',
         },
       },
       playing: {
@@ -94,17 +100,20 @@ export const gameMachine = Machine<GameContext, GameStateSchema, GameEvent>(
       },
       win: {
         on: {
-          REPLAY: 'playing',
+          REPLAY: 'starting',
         },
       },
       lose: {
         on: {
-          REPLAY: 'playing',
+          REPLAY: 'starting',
         },
       },
     },
   },
   {
+    delays: {
+      START_DELAY: 2000,
+    },
     actions: {
       resetGame: assign<GameContext>({
         remainingTime: 20000,

@@ -6,7 +6,9 @@ import { Item } from './components/item';
 import { OrderItem } from './components/order-item';
 import { Paper } from './components/paper';
 import { Separator } from './components/separator';
+import { Sequence } from './components/sequence';
 import { Timer } from './components/timer';
+import { useTransientState } from './hooks';
 import { gameMachine } from './machine';
 import { Food } from './type';
 
@@ -40,21 +42,28 @@ export const App = () => {
   );
   const [{ context, value: gameState }, send] = useMachine(machine);
 
-  const [matchedItems, remainingItems] = React.useMemo(() => {
+  const [hasExtraPoint, setHasExtraPoint] = useTransientState(false);
+  React.useEffect(() => {
+    if (context.result.currentOrder !== 0) {
+      setHasExtraPoint(true);
+    }
+  }, [context.result.currentOrder, setHasExtraPoint]);
+
+  const [selectedItems, remainingItems] = React.useMemo(() => {
     const allOrderItems = (
       context.data.orders[context.result.currentOrder] || []
     ).slice();
-    const matchedItems: Food[] = [];
+    const selectedItems: Food[] = [];
 
     context.result.selectedItem.forEach(selected => {
       const [selectedItem] = allOrderItems.splice(
         allOrderItems.indexOf(selected),
         1
       );
-      matchedItems.push(selectedItem);
+      selectedItems.push(selectedItem);
     });
 
-    return [matchedItems, allOrderItems];
+    return [selectedItems, allOrderItems];
   }, [
     context.data.orders,
     context.result.currentOrder,
@@ -76,15 +85,25 @@ export const App = () => {
           {gameState === 'landing' && (
             <Button onClick={() => send('START')}>Start</Button>
           )}
-          {gameState === 'playing' &&
-            items.map((item, i) => (
-              <Item
-                onClick={() => send({ type: 'SELECT_FOOD', food: item })}
-                matched={remainingItems.includes(item)}
-                type={item}
-                key={i}
-              />
-            ))}
+          {gameState === 'starting' && (
+            <Sequence totalTime={2000}>
+              <h1 className="text-large">Ready?</h1>
+              <h1 className="text-large">Go!</h1>
+            </Sequence>
+          )}
+          {gameState === 'playing' && (
+            <>
+              {items.map((item, i) => (
+                <Item
+                  onClick={() => send({ type: 'SELECT_FOOD', food: item })}
+                  matched={remainingItems.includes(item)}
+                  type={item}
+                  key={i}
+                />
+              ))}
+              {hasExtraPoint && <h1>Extra 2 Points for Complete Order!</h1>}
+            </>
+          )}
           {(gameState === 'win' || gameState === 'lose') && (
             <div>
               <div className="text-large">
@@ -112,7 +131,7 @@ export const App = () => {
               Order completed: {context.result.currentOrder} /{' '}
               {context.data.orders.length}
             </h2>
-            {matchedItems.map((item, i) => (
+            {selectedItems.map((item, i) => (
               <div key={i}>
                 <OrderItem type={item} isSelected={true} />
               </div>
