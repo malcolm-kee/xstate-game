@@ -10,27 +10,30 @@ export const useTransientState = <T>(
   restorationTimeInMs: number = 2000
 ): [T, (val: React.SetStateAction<T>) => void] => {
   const [state, setState] = React.useState(stableState);
-  const timeoutId = React.useRef<number | null>(null);
+  const [calledTimes, setCalledTimes] = React.useState(0);
 
+  /**
+   * set the state to a temporary value. The timeout will be extended everytime
+   * you call this
+   */
   const setTemporaryState = React.useCallback(function setTemporaryState(
     newValue: React.SetStateAction<T>
   ) {
     setState(newValue);
+    setCalledTimes(t => t + 1);
   },
   []);
 
   React.useEffect(() => {
     if (state !== stableState && restorationTimeInMs) {
-      timeoutId.current = setTimeout(
+      const timeoutId = setTimeout(
         () => setState(stableState),
         restorationTimeInMs
       );
 
-      return () => {
-        timeoutId.current && clearTimeout(timeoutId.current);
-      };
+      return () => clearTimeout(timeoutId);
     }
-  }, [state, stableState, restorationTimeInMs]);
+  }, [state, stableState, restorationTimeInMs, calledTimes]);
 
   return [state, setTemporaryState];
 };
